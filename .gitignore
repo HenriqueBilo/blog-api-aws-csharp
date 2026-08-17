@@ -1,0 +1,20 @@
+# .NET
+bin/
+obj/
+*.user
+
+# Terraform
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+*.tfvars
+.terraform.lock.hcl
+crash.log
+crash.*.log
+
+# appsettings com dados sensíveis
+appsettings.Development.json
+
+# IDE
+.vs/
+.vscode/
