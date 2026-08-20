@@ -14,6 +14,8 @@ builder.Services.AddOpenApi();
 builder.Services.AddSingleton<IAmazonDynamoDB>(_ => new AmazonDynamoDBClient(Amazon.RegionEndpoint.GetBySystemName(builder.Configuration["Aws:Region"])));
 builder.Services.AddScoped<IPostService, PostService>();
 
+builder.Services.AddScoped<ICommentService, CommentService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

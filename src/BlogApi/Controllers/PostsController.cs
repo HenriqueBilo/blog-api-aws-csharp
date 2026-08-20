@@ -49,6 +49,6 @@ public class PostsController : ControllerBase
 
         var postCreated = await _postService.CreateAsync(newPost);
 
-        return Ok();
+        return Ok(postCreated);
     }
 }

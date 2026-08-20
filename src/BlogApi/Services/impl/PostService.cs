@@ -47,7 +47,7 @@ public class PostService : IPostService
         var search = _context.ScanAsync<Post>(new List<ScanCondition>(), dynamoConfig);
         var results = new List<Post>();
 
-        while(!search.IsDone)
+        while (!search.IsDone)
         {
             var page = await search.GetNextSetAsync();
             results.AddRange(page);
