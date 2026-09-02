@@ -1,4 +1,5 @@
 using Amazon.DynamoDBv2;
+using Amazon.S3;
 using BlogApi.Services;
 using BlogApi.Services.impl;
 using Scalar.AspNetCore;
@@ -15,6 +16,9 @@ builder.Services.AddSingleton<IAmazonDynamoDB>(_ => new AmazonDynamoDBClient(Ama
 builder.Services.AddScoped<IPostService, PostService>();
 
 builder.Services.AddScoped<ICommentService, CommentService>();
+
+builder.Services.AddSingleton<IAmazonS3>(_ => new AmazonS3Client(Amazon.RegionEndpoint.GetBySystemName(builder.Configuration["Aws:Region"])));
+builder.Services.AddScoped<IImageService, ImageService>();
 
 var app = builder.Build();
 

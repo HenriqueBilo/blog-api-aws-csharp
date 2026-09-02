@@ -11,11 +11,13 @@ public class PostsController : ControllerBase
 {
     private readonly IPostService _postService;
     private readonly IAmazonDynamoDB _amazonDynamoDB;
+    private readonly IImageService _imageService;
 
-    public PostsController(IPostService postService, IAmazonDynamoDB amazonDynamoDB)
+    public PostsController(IPostService postService, IAmazonDynamoDB amazonDynamoDB, IImageService imageService)
     {
         _postService = postService;
         _amazonDynamoDB = amazonDynamoDB;
+        _imageService = imageService;
     }
 
     [HttpGet]
@@ -50,5 +52,20 @@ public class PostsController : ControllerBase
         var postCreated = await _postService.CreateAsync(newPost);
 
         return Ok(postCreated);
+    }
+
+    [HttpPost("{postId}/imagem")]
+    public async Task<ActionResult> UploadImage(string postId, IFormFile file)
+    {
+        var post = await _postService.GetByIdAsync(postId);
+        if (post == null)
+            return NotFound();
+
+        var imageKey = await _imageService.UploadAsync(file, postId);
+        post.ImageUrl = imageKey;
+
+        await _postService.CreateAsync(post);
+
+        return Ok(new { imageKey });
     }
 }
