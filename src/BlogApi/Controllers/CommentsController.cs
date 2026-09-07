@@ -1,6 +1,8 @@
 ﻿using BlogApi.Models;
 using BlogApi.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace BlogApi.Controllers;
 
@@ -25,15 +27,17 @@ public class CommentsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize]
     public async Task<ActionResult<Comment>> CreateAsync(CreateCommentRequest request, string postId)
     {
+        var authorSub = User.FindFirstValue("sub") ?? User.FindFirstValue(ClaimTypes.NameIdentifier);
+
         var comment = new Comment()
         {
             Text = request.Text,
             PostId = postId,
-            AuthorSub = "test"
+            AuthorSub = authorSub ?? "desconhecido"
         };
-
 
         var commentCreated = await _commentsService.CreateAsync(comment);
 

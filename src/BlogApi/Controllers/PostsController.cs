@@ -1,7 +1,9 @@
 ﻿using Amazon.DynamoDBv2;
 using BlogApi.Models;
 using BlogApi.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace BlogApi.Controllers;
 
@@ -40,13 +42,16 @@ public class PostsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize]
     public async Task<ActionResult<Post>> CreateAsync(CreatePostRequest request)
     {
+        var authorSub = User.FindFirstValue("sub") ?? User.FindFirstValue(ClaimTypes.NameIdentifier);
+
         var newPost = new Post()
         {
             Title = request.Title,
             Content = request.Content,
-            AuthorSub = "test"
+            AuthorSub = authorSub ?? "desconhecido"
         };
 
         var postCreated = await _postService.CreateAsync(newPost);

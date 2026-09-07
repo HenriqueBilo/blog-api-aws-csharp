@@ -3,7 +3,10 @@ using Amazon.DynamoDBv2;
 using Amazon.S3;
 using BlogApi.Services;
 using BlogApi.Services.impl;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +29,23 @@ builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddSingleton<IAmazonCognitoIdentityProvider>(_ => new AmazonCognitoIdentityProviderClient(awsRegion));
 builder.Services.AddScoped<IAuthService, AuthService>();
 
+var cognitoAuthority = $"https://cognito-idp.{builder.Configuration["Aws:Region"]}.amazonaws.com/{builder.Configuration["Aws:Cognito:UserPoolId"]}";
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.Authority = cognitoAuthority;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = cognitoAuthority,
+            ValidateLifetime = true,
+            ValidateAudience = false
+        };
+    });
+
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -37,6 +57,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
