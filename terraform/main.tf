@@ -12,7 +12,7 @@ terraform {
   }
   
   backend "s3" {
-    bucket         = "blog-api-terraform-state-ca2b3dda"
+    bucket         = "blog-api-terraform-state-e699cfda"
     key            = "blog-api/terraform.tfstate"
     region         = "us-east-1"
     dynamodb_table = "terraform-locks"
