@@ -1,3 +1,4 @@
+using Amazon.CognitoIdentityProvider;
 using Amazon.DynamoDBv2;
 using Amazon.S3;
 using BlogApi.Services;
@@ -12,13 +13,18 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-builder.Services.AddSingleton<IAmazonDynamoDB>(_ => new AmazonDynamoDBClient(Amazon.RegionEndpoint.GetBySystemName(builder.Configuration["Aws:Region"])));
+var awsRegion = Amazon.RegionEndpoint.GetBySystemName(builder.Configuration["Aws:Region"]);
+
+builder.Services.AddSingleton<IAmazonDynamoDB>(_ => new AmazonDynamoDBClient(awsRegion));
 builder.Services.AddScoped<IPostService, PostService>();
 
 builder.Services.AddScoped<ICommentService, CommentService>();
 
-builder.Services.AddSingleton<IAmazonS3>(_ => new AmazonS3Client(Amazon.RegionEndpoint.GetBySystemName(builder.Configuration["Aws:Region"])));
+builder.Services.AddSingleton<IAmazonS3>(_ => new AmazonS3Client(awsRegion));
 builder.Services.AddScoped<IImageService, ImageService>();
+
+builder.Services.AddSingleton<IAmazonCognitoIdentityProvider>(_ => new AmazonCognitoIdentityProviderClient(awsRegion));
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 var app = builder.Build();
 
