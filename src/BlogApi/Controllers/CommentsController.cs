@@ -11,11 +11,12 @@ namespace BlogApi.Controllers;
 public class CommentsController : ControllerBase
 {
     private readonly ICommentService _commentsService;
+    private readonly INotificationService _notificationService;
 
-    public CommentsController(ICommentService commentService)
+    public CommentsController(ICommentService commentService, INotificationService notificationService)
     {
         _commentsService = commentService;
-
+        _notificationService = notificationService;
     }
 
     [HttpGet]
@@ -40,6 +41,8 @@ public class CommentsController : ControllerBase
         };
 
         var commentCreated = await _commentsService.CreateAsync(comment);
+
+        await _notificationService.PublishNewCommentAsync(commentCreated);
 
         return Ok(commentCreated);
     }
